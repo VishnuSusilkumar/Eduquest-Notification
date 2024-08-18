@@ -14,7 +14,7 @@ const sendMail = async (options: EmailOptions) => {
   const transporter: Transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || "587"),
-    service: process.env.SMPT_SERVICE,
+    service: process.env.SMTP_SERVICE,
     auth: {
       user: process.env.SMTP_MAIL,
       pass: process.env.SMTP_PASSWORD,
@@ -37,3 +37,5 @@ const sendMail = async (options: EmailOptions) => {
 };
 
 export default sendMail;
+
+

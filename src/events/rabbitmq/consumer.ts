@@ -5,7 +5,7 @@ export default class Consumer {
   constructor(private channel: Channel, private rpcQueue: string) {}
 
   async consumeMessages() {
-    console.log("Ready to consume messages...");
+    console.log("Ready to consume-notification messages...");
 
     this.channel.consume(
       this.rpcQueue,

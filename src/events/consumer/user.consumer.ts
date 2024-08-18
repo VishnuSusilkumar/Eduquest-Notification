@@ -8,22 +8,37 @@ const repository = new NotificationRepository();
 const service = new NotificationService(repository);
 const controller = new NotificationController(service);
 
-const Url = String(process.env.RabbitMQ_Link);
-const queue = "activation-code";
+const url = String(process.env.RabbitMQ_Link);
+const activationQueue = "activation-code";
+const resetQueue = "reset-code";
 
-const actionCode = async () => {
+const consumeQueue = async (queue: string, handler: (data: any) => void) => {
   try {
-    const connection = await amqp.connect(Url);
+    const connection = await amqp.connect(url);
     const channel = await connection.createChannel();
     await channel.assertQueue(queue);
 
     channel.consume(queue, (data: any) => {
-      const userdata = JSON.parse(data.content);
-      controller.SendActivationMail(userdata);
+      const parsedData = JSON.parse(data.content);
+      handler(parsedData);
       channel.ack(data);
     });
-  } catch (error) {
-    console.log(error);
+  } catch (e: any) {
+    console.log(e);
+  }
+};
+
+const actionCode = async () => {
+  try {
+    await consumeQueue(activationQueue, (userData) => {
+      controller.sendActivationMail(userData);
+    });
+
+    await consumeQueue(resetQueue, (userData) => {
+      controller.sendResetMail(userData);
+    });
+  } catch (e: any) {
+    console.log(e);
   }
 };
 

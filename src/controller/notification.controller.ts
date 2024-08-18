@@ -1,5 +1,6 @@
 import ejs from "ejs";
 import path from "path";
+import moment from "moment";
 import sendMail from "../utils/sendMail";
 import { INotificationService } from "../interfaces/notification.service";
 import { Notification } from "../model/notification.entities";
@@ -7,18 +8,48 @@ import { Notification } from "../model/notification.entities";
 export class NotificationController {
   constructor(private service: INotificationService) {}
 
-  SendActivationMail = async (data: any) => {
-    const userdata = { user: { name: data.name }, activationCode: data.code };
+  sendActivationMail = async (data: any) => {
+    const currentDate: string = moment().format("DD MM YYYY");
+    const userData = {
+      user: { name: data.name },
+      activationCode: data.code,
+      currentDate: currentDate,
+    };
+
     const html = await ejs.renderFile(
       path.join(__dirname, "../mails/activation-mail.ejs"),
-      userdata
+      userData
     );
     try {
       await sendMail({
         email: data.email,
         subject: "Activate your account",
         template: "activation-mail.ejs",
-        data: userdata,
+        data: userData,
+      });
+    } catch (e: any) {
+      console.log(e);
+    }
+  };
+
+  sendResetMail = async (data: any) => {
+    const currentDate: string = moment().format("DD MM YYYY");
+    console.log("UserDetails:", data);
+    const userData = {
+      user: { name: data.name },
+      resetCode: data.resetCode,
+      currentDate: currentDate,
+    };
+    const html = await ejs.renderFile(
+      path.join(__dirname, "../mails/reset-mail.ejs"),
+      userData
+    );
+    try {
+      await sendMail({
+        email: data.email,
+        subject: "Rest your password",
+        template: "reset-mail.ejs",
+        data: userData,
       });
     } catch (e: any) {
       console.log(e);
