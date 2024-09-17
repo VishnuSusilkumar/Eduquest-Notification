@@ -58,7 +58,8 @@ export class NotificationController {
 
   createNotification = (data: Notification) => {
     try {
-      return this.service.createNotification(data);
+      const response = this.service.createNotification(data);
+      return response
     } catch (e: any) {
       console.log(e);
     }
